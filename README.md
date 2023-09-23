@@ -1,2 +1,2 @@
 # RestaurantTakeOut
-Restaurant take out services
+The Daily Takeout
