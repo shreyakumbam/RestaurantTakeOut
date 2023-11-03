@@ -10,7 +10,7 @@ const verifyToken = (req, res, callback) => {
     // The following line should be uncommented if you're planning to get the token from headers in the future.
     
     // const token = req.headers.authorization;
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZU51bSI6Miwicm9sZSI6Im1hbmFnZXIiLCJ1c2VySUQiOiJtYW5hZ2VyMTIzIiwiaWF0IjoxNjk5MDI0MzkyLCJleHAiOjE2OTkwMjc5OTJ9.CxIODjHC_59SolLHenyo9GW1i9nYjl-MzXWtmiu0z4M"
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZU51bSI6Miwicm9sZSI6Im1hbmFnZXIiLCJ1c2VySUQiOiJtYW5hZ2VyMTIzIiwiaWF0IjoxNjk5MDQxMzgzLCJleHAiOjE2OTkwNDQ5ODN9.a9y5kUiWqeTwaPHAsITm0qmmPmQrMWJG-5BDuYwBdFc"
 
     if (!token) {
         res.writeHead(403, { 'Content-Type': 'application/json' });
@@ -157,7 +157,7 @@ const fetchRoleChangeReqeust = (req, res) => {
 
 const approveRoleChangeRequest = (req, res) => {
     const { userID } = req.body;
-    
+
     if (!userID) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'User ID is required' }));
@@ -172,17 +172,54 @@ const approveRoleChangeRequest = (req, res) => {
             return;
         }
 
-        // Check if any row was updated
-        if (results.affectedRows === 0) {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ message: "Invalid userID or no such request found" }));
-            return;
-        }
+        // Check if the number of approvals is 3
+        connection.query('SELECT numApproval, toBeRole FROM RoleChangeRequest WHERE userID = ?', [userID], (error, results) => {
+            if (error) {
+                console.error(error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Internal server error" }));
+                return;
+            }
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: "Role change request approved" }));
+            if (results.length === 0) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Role change request not found for the given userID" }));
+                return;
+            }
+
+            const approvals = results[0].numApproval;
+            const newRole = results[0].toBeRole;
+
+            if (approvals === 3) {
+                connection.query('UPDATE Employee SET roleStatus = 0, roleName = ? WHERE userID = ?', [newRole, userID], (error) => {
+                    if (error) {
+                        console.error(error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: "Internal server error" }));
+                        return;
+                    }
+
+                    connection.query('DELETE FROM RoleChangeRequest WHERE userID = ?', [userID], (error) => {
+                        if (error) {
+                            console.error(error);
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ message: "Internal server error" }));
+                            return;
+                        }
+
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: "Role change finalized and request deleted" }));
+                    });
+                });
+            } else {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Role change request approved" }));
+            }
+        });
     });
 };
+
+
 
 const declineRoleChangeRequest = (req, res) => {
     const { userID } = req.body;
