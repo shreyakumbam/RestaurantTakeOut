@@ -42,16 +42,20 @@ const server = http.createServer((req, res) => {
             signIn({ body: data }, res);
         });
     } else if (path === '/fetchEmployee' && method === 'GET') {
-        verifyToken(req, res, (err) => {
+        verifyToken(req, res, (err, initiatingManagerID) => {  // Here we don't use the initiatingManagerID
             if(err) {
+                console.log(initiatingManagerID)
+                console.log("you fail token verification")
+                console.error("Token verification failed:", err);
                 res.writeHead(err.status || 500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ message: err.message }));
                 return;
             }
+            console.log("you pass token verification")
             fetchEmployee(req, res);
         });
-     } else if (path === '/rolechangerequests' && method === 'POST') {
-        verifyToken(req, res, (err) => {
+    } else if (path === '/rolechangerequests' && method === 'POST') {
+        verifyToken(req, res, (err, initiatingManagerID) => {
             if(err) {
                 res.writeHead(err.status || 500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ message: err.message }));
@@ -63,7 +67,7 @@ const server = http.createServer((req, res) => {
                     res.end(JSON.stringify({ message: 'Invalid JSON' }));
                     return;
                 }
-                req.body = data;
+                req.body = { ...data, initiatingManagerID };
                 requestRoleChange(req, res);
             });
         });

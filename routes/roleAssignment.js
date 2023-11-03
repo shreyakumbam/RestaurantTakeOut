@@ -10,8 +10,8 @@ const verifyToken = (req, res, callback) => {
     // The following line should be uncommented if you're planning to get the token from headers in the future.
     
     // const token = req.headers.authorization;
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZU51bSI6NCwicm9sZSI6Im1hbmFnZXIiLCJpYXQiOjE2OTg5OTIzMTcsImV4cCI6MTY5ODk5NTkxN30.x1Ug_YYbf5svk_kem2gGANZ689wcwG6LhJxlhwDcHhA";
-
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZU51bSI6Miwicm9sZSI6Im1hbmFnZXIiLCJ1c2VySUQiOiJtYW5hZ2VyMTIzIiwiaWF0IjoxNjk4OTk3MDEzLCJleHAiOjE2OTkwMDA2MTN9.dLtc7CPzNrTZdEWq7nGXWvYb9Qthh9sZ5O3qbtyrtqM"
+    
     if (!token) {
         res.writeHead(403, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: "No token provided!" }));
@@ -33,7 +33,7 @@ const verifyToken = (req, res, callback) => {
             return;
         }
 
-        callback(decoded.userID);  // Move to the next function if role is manager
+        callback(null, decoded.userID);    // callback with null as the first parameter when there is no error and with an error object when there is an error.
     });
 };
 
@@ -67,7 +67,7 @@ const sendNotification = (userID, message, callback) => {
 };
 
 const requestRoleChange = (req, res) => {
-    const {userID} = req.body;
+    const {userID, initiatingManagerID} = req.body;
 
     if (!userID) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -94,7 +94,7 @@ const requestRoleChange = (req, res) => {
             }
 
             // Fetch all manager IDs, excluding the initiating manager
-            connection.query('SELECT userID FROM Employee WHERE role = "Manager" AND userID != ?', [userID], (error, managers) => {
+            connection.query('SELECT userID FROM Employee WHERE roleName = "Manager" AND userID != ?', [initiatingManagerID], (error, managers) => {
                 if (error) {
                     console.error(error);
                     res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -105,6 +105,7 @@ const requestRoleChange = (req, res) => {
                 // For each manager, send a notification using the sendNotification function
                 const message = `A role change has been requested for Employee with userID: ${userID}. Please review.`;
                 let notificationsSent = 0;
+                console.log(`num of managers: ${managers.length}`)
                 for (let manager of managers) {
                     sendNotification(manager.userID, message, (error) => {
                         if (error) {
