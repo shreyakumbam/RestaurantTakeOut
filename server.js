@@ -1,4 +1,6 @@
 const http = require('http');
+const url = require('url');
+
 const { signUp, signIn } = require('./routes/user');
 const {verifyToken,  
     fetchEmployee, 
@@ -90,41 +92,29 @@ const server = http.createServer((req, res) => {
             fetchRoleChangeReqeust(req, res);
         });
     
-    } else if (path === '/reviewrolechange/approve' && method === 'PUT') {
+    } else if (path.startsWith('/manager/role-change-requests/') && path.endsWith('/approve') && method === 'PUT') {
+        const userID = path.split('/')[3]; // Extract the userID from the URL.
+        req.params = { userID: userID }; // Attach the userID to the request object as params.
+    
         verifyToken(req, res, (err, initiatingManagerID) => {
             if(err) {
                 res.writeHead(err.status || 500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ message: err.message }));
                 return;
             }
-            parseJSONBody(req, (err, data) => {
-                if (err) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ message: 'Invalid JSON' }));
-                    return;
-                }
-                req.body = { ...data, initiatingManagerID };
-                approveRoleChangeRequest(req, res);
-            });
+            approveRoleChangeRequest(req, res);
         });
-    } else if (path === '/reviewrolechange/decline' && method === 'DELETE') {
+    } else if (path.startsWith('/manager/role-change-requests/') && path.endsWith('/decline') && method === 'DELETE') {
+        const userID = path.split('/')[3]; // Extract the userID from the URL.
+        req.params = { userID: userID }; // Attach the userID to the request object as params.
         verifyToken(req, res, (err, initiatingManagerID) => {
             if(err) {
                 res.writeHead(err.status || 500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ message: err.message }));
                 return;
             }
-            parseJSONBody(req, (err, data) => {
-                if (err) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ message: 'Invalid JSON' }));
-                    return;
-                }
-                req.body = { ...data, initiatingManagerID };
-                declineRoleChangeRequest(req, res);
-            });
+            declineRoleChangeRequest(req, res);
         });
-        
     }else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Not Found' }));

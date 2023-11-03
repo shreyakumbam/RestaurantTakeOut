@@ -52,6 +52,7 @@ const fetchEmployee = (req, res) => {
     });
 };
 
+
 const sendNotification = (userID, message, callback) => {
     const notificationType = "roleChange"; //defult is roleChange
     const query = 'INSERT INTO Notification (UserID, NotificationType, message, notificationDate, seen) VALUES (?, ?, ?, NOW(), ?)';
@@ -65,6 +66,7 @@ const sendNotification = (userID, message, callback) => {
         callback(null, results);
     });
 };
+
 
 const requestRoleChange = (req, res) => {
     const {userID, toBeRole, initiatingManagerID} = req.body;
@@ -141,6 +143,7 @@ const requestRoleChange = (req, res) => {
     });
 };
 
+
 const fetchRoleChangeReqeust = (req, res) => {
     connection.query('SELECT userID, numApproval, asIsRole, toBeRole FROM RoleChangeRequest', (error, employees) => {
         if (error) {
@@ -155,8 +158,9 @@ const fetchRoleChangeReqeust = (req, res) => {
     });
 };
 
+
 const approveRoleChangeRequest = (req, res) => {
-    const { userID } = req.body;
+    const userID = req.params.userID;
 
     if (!userID) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -220,9 +224,8 @@ const approveRoleChangeRequest = (req, res) => {
 };
 
 
-
 const declineRoleChangeRequest = (req, res) => {
-    const { userID } = req.body;
+    const userID = req.params.userID;
     
     if (!userID) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -230,7 +233,8 @@ const declineRoleChangeRequest = (req, res) => {
         return;
     }
 
-    connection.query('DELETE FROM RoleChangeRequest WHERE userID = ?', [userID], (error, results) => {
+    // Update the roleStatus to 0 in the Employee table
+    connection.query('UPDATE Employee SET roleStatus = 0 WHERE userID = ?', [userID], (error, results) => {
         if (error) {
             console.error(error);
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -238,19 +242,27 @@ const declineRoleChangeRequest = (req, res) => {
             return;
         }
 
-        // Check if any row was deleted
-        if (results.affectedRows === 0) {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ message: "Invalid userID or no such request found" }));
-            return;
-        }
+        // Delete the request from RoleChangeRequest table
+        connection.query('DELETE FROM RoleChangeRequest WHERE userID = ?', [userID], (error, results) => {
+            if (error) {
+                console.error(error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Internal server error" }));
+                return;
+            }
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: "Role change request declined" }));
+            // Check if any row was deleted
+            if (results.affectedRows === 0) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Invalid userID or no such request found" }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: "Role change request declined and role status reset" }));
+        });
     });
 };
-
-
 
 module.exports = {
     verifyToken,
