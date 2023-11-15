@@ -1,13 +1,15 @@
 const http = require('http');
 const url = require('url');
 
-const { signUp, signIn } = require('./routes/user');
+const { signUp, signIn } = require('./routes/employeeSign');
 const {verifyToken,  
     fetchEmployee, 
     requestRoleChange, 
     fetchRoleChangeReqeust, 
     approveRoleChangeRequest,
     declineRoleChangeRequest} = require('./routes/roleAssignment');
+
+const {menuUpload} = require('./routes/menuUpload.js')
 
 const PORT = 3000;
 
@@ -115,7 +117,24 @@ const server = http.createServer((req, res) => {
             }
             declineRoleChangeRequest(req, res);
         });
-    }else {
+    } else if (path === '/manager/menu' && method === 'POST') {
+        verifyToken(req, res, (err, initiatingManagerID) => {
+            if(err) {
+                res.writeHead(err.status || 500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: err.message }));
+                return;
+            }
+            parseJSONBody(req, (err, data) => {
+                if (err) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'Invalid JSON' }));
+                    return;
+                }
+                menuUpload({ body: data }, res); 
+            });
+        });
+        
+    } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Not Found' }));
     }
