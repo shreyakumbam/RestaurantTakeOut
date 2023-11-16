@@ -1,15 +1,15 @@
 const http = require('http');
 const url = require('url');
 
-const { signUp, signIn } = require('./routes/employeeSign');
+const { signUp, signIn } = require('./use_case/manager/employeeSign.js');
 const {verifyToken,  
     fetchEmployee, 
     requestRoleChange, 
     fetchRoleChangeReqeust, 
     approveRoleChangeRequest,
-    declineRoleChangeRequest} = require('./routes/roleAssignment');
+    declineRoleChangeRequest} = require('./use_case/manager/roleAssignment.js');
 
-const {menuUpload} = require('./routes/menuUpload.js')
+const {menuUpload} = require('./use_case/manager/menuUpload.js')
 
 const PORT = 3000;
 

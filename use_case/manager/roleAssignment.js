@@ -3,7 +3,7 @@ dotenv.config();
 const SECRET_KEY = process.env.JWT_Secret_key;
 
 const jwt = require('jsonwebtoken');
-const { connection } = require('../utils/database');
+const { connection } = require('../../utils/database');
 
 // Token Verification
 const verifyToken = (req, res, callback) => {
