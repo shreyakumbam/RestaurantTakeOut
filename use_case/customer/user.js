@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { google } = require('googleapis');
 const mysql = require('mysql2/promise');
-const { generateToken } = require('../utils/authentication'); // Ensure this path is correct
+const { generateToken } = require('../../utils/authentication'); // Ensure this path is correct
 require('dotenv').config();
 
 const clientid = process.env.CLIENT_ID;
