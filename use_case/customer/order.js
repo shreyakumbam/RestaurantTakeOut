@@ -1,6 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
-const { authenticateToken } = require('../utils/authentication');
+const { authenticateToken } = require('../../utils/authentication');
 
 const router = express.Router();
 require('dotenv').config();

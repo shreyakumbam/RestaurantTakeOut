@@ -22,7 +22,7 @@ const signUp = (req, res) => {
             return;
         }
         connection.query('INSERT INTO Employee (userName, roleName, roleStatus, dateAssigned, userID, pw) VALUES (?, ?, ?, ?, ?, ?)', 
-        [userName, 'Receptionist', 0, new Date().toISOString().slice(0, 10), userID, pw], (err) => {
+        [userName, 'receptionist', 0, new Date().toISOString().slice(0, 10), userID, pw], (err) => {
             if (err) {
                 console.error(err);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
