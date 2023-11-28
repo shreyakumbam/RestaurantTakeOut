@@ -16,6 +16,8 @@ const menuRoutes = require('./use_case/customer/menu.js');
 const orderRoutes = require('./use_case/customer/order.js');
 const userRoutes = require('./use_case/customer/user.js');
 
+const searchRouter = require('./use_case/serach/Search.js')
+
 const app = express();
 const PORT = 3000;
 
@@ -25,7 +27,9 @@ app.use(bodyParser.json());
 
 app.use('/menu', menuRoutes);
 app.use('/order', orderRoutes);
-app.use('/user', userRoutes); 
+app.use('/user', userRoutes);
+
+app.use('/search', searchRouter);
 
 // Define a route for handling POST requests to "/signup"
 app.post('/signup', (req, res) => {
