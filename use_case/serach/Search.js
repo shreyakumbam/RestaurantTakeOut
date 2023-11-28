@@ -1,10 +1,10 @@
 require('dotenv').config()
 
 const express = require('express')
-const searchService = express()
+const router = express.Router();
 
 const mySql = require('mysql') 
-searchService.use(express.json())
+router.use(express.json())
 
 function initiateDBConnection() {
     //Create SQL connection logic
@@ -20,7 +20,7 @@ function initiateDBConnection() {
 
 
 // endpoint for getting menu item. Optional Query param that provides the excluted ingredient
-searchService.get('/menu/:item', (request, response) => {
+router.get('/menu/:item', (request, response) => {
     let responseMessage;
     let sqlQueryStatement;
     const excludeIngredient = request.query.excludeIngredient
@@ -77,7 +77,7 @@ searchService.get('/menu/:item', (request, response) => {
 })
 
 //Endpoint to get menu item without allegern
-searchService.get('/menu/exclude/allergen/:AllergenID', (request, response) => {
+router.get('/menu/exclude/allergen/:AllergenID', (request, response) => {
   let responseMessage = {};
 
   try {
@@ -122,7 +122,7 @@ searchService.get('/menu/exclude/allergen/:AllergenID', (request, response) => {
 });
 
 //Endpoint to get menu item lower then given price
-searchService.get('/menu/item/price/:price', (request, response) => {
+router.get('/menu/item/price/:price', (request, response) => {
     let responseMessage = {};
 
     try {
@@ -166,4 +166,5 @@ searchService.get('/menu/item/price/:price', (request, response) => {
     }
 });
 
-searchService.listen(3000, () => console.log('server started'))
+// searchService.listen(3000, () => console.log('server started'))
+module.exports = router;
