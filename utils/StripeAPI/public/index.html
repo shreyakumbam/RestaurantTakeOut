@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Payment Site</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Include your stylesheet for styling -->
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Secure Payment</h1>
+
+    <!-- Card input -->
+    <div id="card-element" class="card-element"></div>
+
+    <!-- Submit button -->
+    <button id="submit">
+      <div class="spinner hidden" id="spinner"></div>
+      <span id="button-text">Complete Payment</span>
+    </button>
+
+    <!-- Payment result message -->
+    <p id="payment-result" role="alert"></p>
+  </div>
+
+  <script>
+    // Use your Stripe publishable key here
+    const stripe = Stripe('pk_test_51OHUZAHyLIxiU1r8YMqbX9fdU8NCx8kaOEpuaVo9kjGwATFGSfenRASmVnJfJSe5nj8oSsGXNREWy1D12UJ2MRCj00yrsWDaH6');
+    const elements = stripe.elements();
+
+    // Create an instance of the card Element
+    const card = elements.create('card', {
+      style: {
+        base: {
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '16px',
+          color: '#32325d',
+          '::placeholder': {
+            color: '#aab7c4',
+          },
+        },
+        invalid: {
+          color: '#fa755a',
+        },
+      },
+    });
+    card.mount('#card-element');
+
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit');
+    const resultContainer = document.getElementById('payment-result');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Disable the submit button to prevent multiple submissions
+      submitButton.disabled = true;
+
+      const { token, error } = await stripe.createToken(card);
+
+      // Enable the submit button after creating the token
+      submitButton.disabled = false;
+
+      if (error) {
+        console.error(error);
+        resultContainer.textContent = `Error: ${error.message}`;
+      } else {
+        // Send the token to your server
+        fetch('/create-payment-intent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token }),
+        })
+          .then(response => response.json())
+          .then(({ clientSecret }) => {
+            // Use the clientSecret to confirm the payment on the client side
+            stripe.confirmCardPayment(clientSecret, {
+              payment_method: {
+                card: card,
+              },
+            })
+              .then(result => {
+                if (result.error) {
+                  console.error(result.error);
+                  resultContainer.textContent = `Error: ${result.error.message}`;
+                } else {
+                  // Payment succeeded
+                  console.log(result.paymentIntent);
+                  resultContainer.textContent = 'Payment succeeded!';
+                }
+              });
+          });
+      }
+    });
+  </script>
+
+  <style>
+    /* Add your styles here or link to an external stylesheet */
+    body {
+      font-family: 'Helvetica, Arial, sans-serif';
+      background-color: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .card-element {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #payment-result {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #4caf50;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+      display: inline-block;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>
