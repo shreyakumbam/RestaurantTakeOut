@@ -12,9 +12,9 @@ const {verifyToken,
     declineRoleChangeRequest} = require('./use_case/manager/roleAssignment.js');
 const {menuUpload} = require('./use_case/manager/menuUpload.js')
 
-const menuRoutes = require('./use_case/customer/menu.js');
-const orderRoutes = require('./use_case/customer/order.js');
-const userRoutes = require('./use_case/customer/user.js');
+// const menuRoutes = require('./use_case/customer/menu.js');
+// const orderRoutes = require('./use_case/customer/order.js');
+// const userRoutes = require('./use_case/customer/user.js');
 
 const searchRouter = require('./use_case/serach/Search.js')
 
@@ -25,9 +25,9 @@ const PORT = 3000;
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-app.use('/menu', menuRoutes);
-app.use('/order', orderRoutes);
-app.use('/user', userRoutes);
+// app.use('/menu', menuRoutes);
+// app.use('/order', orderRoutes);
+// app.use('/user', userRoutes);
 
 app.use('/search', searchRouter);
 
