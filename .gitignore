@@ -4,3 +4,4 @@ node_modules/
 populateEmployee.js
 .DS_Store
 use_case/manager/uploadImage.js
+us-east-2-bundle.pem
