@@ -2,13 +2,15 @@ const http = require('http');
 const url = require('url');
 const mysql = require('mysql2');
 const fs = require('fs');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // Create a MySQL connection
 const db = mysql.createConnection({
-    host: 'daily-db.cxalyiy1trhs.us-east-2.rds.amazonaws.com',
-    user: 'admin',
-    password: 'dailydb10!',
-    database: 'dailydb',
+    host: process.env.DB_HOST;,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_Name,
 });
 
 // Connect to the MySQL database
