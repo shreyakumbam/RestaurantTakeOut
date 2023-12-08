@@ -7,10 +7,6 @@ const { connection } = require('../../utils/database');
 
 // Token Verification
 const verifyToken = (req, res, callback) => {
-    // The following line should be uncommented if you're planning to get the token from headers in the future.
-    
-    // const token = req.headers.authorization;
-    // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZU51bSI6Miwicm9sZSI6Im1hbmFnZXIiLCJ1c2VySUQiOiJtYW5hZ2VyMTIzIiwiaWF0IjoxNjk5MDQxMzgzLCJleHAiOjE2OTkwNDQ5ODN9.a9y5kUiWqeTwaPHAsITm0qmmPmQrMWJG-5BDuYwBdFc"
     const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
     
     if (!token) {
