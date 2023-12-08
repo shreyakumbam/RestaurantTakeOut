@@ -12,6 +12,8 @@ const {verifyToken,
     declineRoleChangeRequest} = require('./use_case/manager/roleAssignment.js');
 const {menuUpload} = require('./use_case/manager/menuUpload.js')
 
+const { generateUploadURL } = require('./use_case/manager/pasS3Url.js');
+
 // const menuRoutes = require('./use_case/customer/menu.js');
 // const orderRoutes = require('./use_case/customer/order.js');
 // const userRoutes = require('./use_case/customer/user.js');
@@ -24,6 +26,7 @@ const PORT = 3000;
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+app.use(express.static('front'));
 
 // app.use('/menu', menuRoutes);
 // app.use('/order', orderRoutes);
@@ -39,6 +42,22 @@ app.post('/signup', (req, res) => {
     }
     signUp({ body: data }, res);
 });
+
+
+
+app.post('/s3Url', async (req, res) => {
+  const imageName = req.body.imageName; // Get the image name from the request body
+  if (!imageName) {
+    return res.status(400).send({ error: 'Image name is required' });
+  }
+  
+  try {
+    const url = await generateUploadURL(imageName);
+    res.send({ url });
+  } catch (error) {
+    res.status(500).send({ error: 'Error generating the upload URL' });
+  }
+})
 
 // Define a route for handling POST requests to "/signin"
 app.post('/signin', (req, res) => {
