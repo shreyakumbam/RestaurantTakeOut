@@ -31,7 +31,7 @@ imageForm.addEventListener("submit", async event => {
     return;
   }
 
-  const { url } = await fetchResponse.json();
+  const { url } = await fetchResponse.json(); //generage temporary url to access S3 bucket
   console.log(url);
 
   // Use the URL to upload the file to S3
