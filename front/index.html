@@ -1,21 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="index.css">
-  <title>Upload Image</title>
+  <title>Signup/Signin Form</title>
+  <!-- Prevent browsers from requesting a favicon -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <script src="index.js" defer></script>
 </head>
 <body>
-  
-  <form id="imageForm">
-    <input id="imageNameInput" type="text" placeholder="Enter image name" required>
-    <input id="imageInput" type="file" accept="image/*" required>
-    <button type="submit">Upload</button>
-  </form>
 
-  <script src="index.js"></script>
+<h2>Signup Form</h2>
+
+<form id="signupForm" action="http://localhost:3000/signup" method="post">
+  <label for="signupUserName">Username:</label><br>
+  <input type="text" id="signupUserName" name="userName" required><br>
+  
+  <label for="signupUserID">User ID:</label><br>
+  <input type="text" id="signupUserID" name="userID" required><br>
+  
+  <label for="signupPw">Password:</label><br>
+  <input type="password" id="signupPw" name="pw" required><br><br>
+  
+  <input type="submit" value="Signup">
+</form>
+
+<h2>Signin Form</h2>
+
+<form id="signinForm" action="http://localhost:3000/signin" method="post">
+  <label for="signinUserName">UserID:</label><br>
+  <input type="text" id="signinUserName" name="userID" required><br>
+  
+  <label for="signinPw">Password:</label><br>
+  <input type="password" id="signinPw" name="pw" required><br><br>
+  
+  <input type="submit" value="Sign In">
+</form>
+
+<div id="response"></div>
 
 </body>
 </html>
