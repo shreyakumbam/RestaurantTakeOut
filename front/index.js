@@ -1,88 +1,46 @@
-const imageForm = document.querySelector("#imageForm");
-const imageInput = document.querySelector("#imageInput");
-const imageNameInput = document.querySelector("#imageNameInput"); // New input for image name
-
-imageForm.addEventListener("submit", async event => {
+function submitForm(event) {
   event.preventDefault();
-  const file = imageInput.files[0];
-  const imageName = imageNameInput.value; // Get the image name from the input
 
-  if (!file || !imageName) {
-    alert('Please select a file and enter an image name.');
-    return;
-  }
+  const form = event.target;
+  const url = form.action;
+  const formData = new FormData(form);
+  const jsonData = {};
 
-  // Object to hold the image name
-  const requestData = {
-    imageName: imageName
-  };
+  formData.forEach((value, key) => { jsonData[key] = value; });
 
-  // Fetch the presigned URL from your server
-  const fetchResponse = await fetch("/s3Url", {
-    method: "POST", // You might need to change this method to POST if not already done
+  fetch(url, {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json"
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(requestData) // Send the image name along with the request
+    body: JSON.stringify(jsonData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(errorData => {
+        throw new Error(errorData.message || 'Server responded with a non-OK status');
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.token) {
+      // Store the token in localStorage
+      localStorage.setItem('jwtToken', data.token);
+      // If a token is received, navigate to the new page
+      window.location.href = 'menu_update/menu_update.html';
+    } else {
+      console.log('Success:', data);
+      document.getElementById('response').textContent = 'Success! ' + (data.message || 'You are now signed in.');
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error.message);
+    document.getElementById('response').textContent = 'Error: ' + error.message;
   });
+}
 
-  if (!fetchResponse.ok) {
-    alert('Failed to get the presigned URL.');
-    return;
-  }
-
-  const { url } = await fetchResponse.json();
-  console.log(url);
-
-  // Use the URL to upload the file to S3
-  const uploadResponse = await fetch(url, {
-    method: "PUT",
-    body: file
-  });
-
-  if (!uploadResponse.ok) {
-    alert('Failed to upload image.');
-    return;
-  }
-
-  const imageUrl = url.split('?')[0];
-  console.log(imageUrl);
-
-  // Display the uploaded image by appending it to the DOM
-  const img = document.createElement("img");
-  img.src = imageUrl;
-  document.body.appendChild(img);
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('signupForm').addEventListener('submit', submitForm);
+  document.getElementById('signinForm').addEventListener('submit', submitForm);
 });
-
-
-
-// const imageForm = document.querySelector("#imageForm")
-// const imageInput = document.querySelector("#imageInput")
-
-// imageForm.addEventListener("submit", async event => {
-//   event.preventDefault()
-//   const file = imageInput.files[0]
-
-// //   get secure url from our server
-//   const { url } = await fetch("/s3Url").then(res => res.json())
-//   console.log(url)
-
-//   // post the image direclty to the s3 bucket
-//   await fetch(url, {
-//     method: "PUT",
-//     headers: {
-//       "Content-Type": "multipart/form-data"
-//     },
-//     body: file
-//   })
-
-//   const imageUrl = url.split('?')[0]
-//   console.log(imageUrl)
-
-// //   // post requst to my server to store any extra data
-  
-  
-//   const img = document.createElement("img")
-//   img.src = imageUrl
-//   document.body.appendChild(img)
-// })

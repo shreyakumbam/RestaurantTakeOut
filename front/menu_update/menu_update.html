@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Item Upload and Update</title>
+  <!-- Include any additional CSS or JavaScript files here -->
+</head>
+<body>
+  
+  <h1>Upload Menu Image</h1>
+  <form id="imageForm">
+    <input id="imageNameInput" type="text" placeholder="Enter image name" required>
+    <input id="imageInput" type="file" accept="image/*" required>
+    <button type="submit">Upload</button>
+  </form>
+
+  <h1>Update Menu Item</h1>
+  <form id="updateForm">
+    <label for="menuItemName">Menu Item Name:</label>
+    <input type="text" id="menuItemName" name="menuItemName" required><br><br>
+
+    <label for="price">Price:</label>
+    <input type="number" id="price" name="price" step="0.01" required><br><br>
+
+    <label for="allergenDetails">Allergen Details:</label>
+    <input type="text" id="allergenDetails" name="allergenDetails" required><br><br>
+
+    <div id="ingredientsContainer">
+      <!-- Ingredients will be added here -->
+      <label for="ingredientName1">Ingredient Name:</label>
+      <input type="text" id="ingredientName1" name="ingredientName1" required>
+      
+      <label for="ingredientQuantity1">Quantity:</label>
+      <input type="number" id="ingredientQuantity1" name="ingredientQuantity1" required><br><br>
+    </div>
+    
+    <button type="button" id="addIngredient">Add Ingredient</button><br><br>
+
+    <input type="submit" value="Update Menu Item">
+  </form>
+
+  <div id="response"></div>
+
+  <script src="update_menu.js"></script>
+  <script src="upload_image.js"></script>
+  
+</body>
+</html>
