@@ -1,9 +1,13 @@
-const http = require('http');
-const url = require('url');
+const express = require('express');
+const bodyParser = require('body-parser');
 const mysql = require('mysql2');
-const fs = require('fs');
 const dotenv = require('dotenv');
 dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3306;
+
+app.use(bodyParser.json());
 
 // Create a MySQL connection
 const db = mysql.createConnection({
@@ -22,97 +26,79 @@ db.connect((err) => {
   console.log('Connected to MySQL as id ' + db.threadId);
 });
 
-// Create an HTTP server
-const server = http.createServer((req, res) => {
-  const { pathname, query } = url.parse(req.url, true);
+// Fetch Inventory
+app.get('/fetchInventory', (req, res) => {
+  const query = 'SELECT * FROM Inventory';
 
-  if (req.method === 'GET' && pathname === '/fetchInventory') {
-    // Retrieve and return the inventory
-    const query = 'SELECT * FROM Inventory';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      const inventory = results.map((row) => ({
+        ingredientID: row.ingredientID,
+        ingredientName: row.ingredientName,
+        quantity: row.quantity,
+      }));
 
-    db.query(query, (err, results) => {
+      res.status(200).json(inventory);
+    }
+  });
+});
+
+// Update Inventory
+app.post('/updateInventory', (req, res) => {
+  try {
+    const data = req.body;
+
+    const ingredientName = data.ingredientName;
+    const quantity = data.quantity;
+
+    // Check if the ingredient already exists
+    const checkQuery = 'SELECT * FROM Inventory WHERE ingredientName = ?';
+
+    db.query(checkQuery, [ingredientName], (err, results) => {
       if (err) {
         console.error(err);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Internal Server Error' }));
-      } else {
-        const inventory = results.map((row) => ({
-          ingredientID: row.ingredientID,
-          ingredientName: row.ingredientName,
-          quantity: row.quantity,
-        }));
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else if (results.length === 0) {
+        // Insert a new ingredient
+        const insertQuery = 'INSERT INTO Inventory (ingredientName, quantity) VALUES (?, ?)';
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(inventory));
-      }
-    });
-  } else if (req.method === 'POST' && pathname === '/updateInventory') {
-    // Handle adding or updating an inventory item
-    let body = '';
-
-    req.on('data', (chunk) => {
-      body += chunk;
-    });
-
-    req.on('end', () => {
-      try {
-        const data = JSON.parse(body);
-
-        const ingredientName = data.ingredientName;
-        const quantity = data.quantity;
-
-        // Check if the ingredient already exists
-        const checkQuery = 'SELECT * FROM Inventory WHERE ingredientName = ?';
-
-        db.query(checkQuery, [ingredientName], (err, results) => {
+        db.query(insertQuery, [ingredientName, quantity], (err, insertResults) => {
           if (err) {
             console.error(err);
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Internal Server Error' }));
-          } else if (results.length === 0) {
-            // Insert a new ingredient
-            const insertQuery = 'INSERT INTO Inventory (ingredientName, quantity) VALUES (?, ?)';
-
-            db.query(insertQuery, [ingredientName, quantity], (err, insertResults) => {
-              if (err) {
-                console.error(err);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Internal Server Error' }));
-              } else {
-                res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: 'Inventory item added' }));
-              }
-            });
+            res.status(500).json({ error: 'Internal Server Error' });
           } else {
-            // Update the existing ingredient
-            const updateQuery = 'UPDATE Inventory SET quantity = ? WHERE ingredientName = ?';
-
-            db.query(updateQuery, [quantity, ingredientName], (err, updateResults) => {
-              if (err) {
-                console.error(err);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Internal Server Error' }));
-              } else {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: 'Inventory item updated' }));
-              }
-            });
+            res.status(201).json({ message: 'Inventory item added' });
           }
         });
-      } catch (error) {
-        console.error(error);
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+      } else {
+        // Update the existing ingredient
+        const updateQuery = 'UPDATE Inventory SET quantity = ? WHERE ingredientName = ?';
+
+        db.query(updateQuery, [quantity, ingredientName], (err, updateResults) => {
+          if (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
+          } else {
+            res.status(200).json({ message: 'Inventory item updated' });
+          }
+        });
       }
     });
-  } else {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Not Found' }));
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: 'Invalid JSON data' });
   }
 });
 
+// 404 Not Found
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
 // Start the server
-const port = process.env.PORT || 3306;
-server.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(port, () => {
+  console.log('Server is running on port 3306');
 });
