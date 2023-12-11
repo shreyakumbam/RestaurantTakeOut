@@ -14,6 +14,9 @@ const {menuUpload} = require('./use_case/manager/menuUpload.js')
 
 const { generateUploadURL } = require('./use_case/manager/pasS3Url.js');
 
+const { updateOrderStatus } = require('./use_case/kitchen_staff/orderStatus.js');
+
+
 // const menuRoutes = require('./use_case/customer/menu.js');
 // const orderRoutes = require('./use_case/customer/order.js');
 // const userRoutes = require('./use_case/customer/user.js');
@@ -147,6 +150,11 @@ app.post('/manager/menu', (req, res) => {
         }
         menuUpload({ body: data }, res);
     });
+});
+
+// Define a route for handling PUT requests to "/kitchen_staff/updateOrderStatus"
+app.put('/kitchen_staff/orderStatus/:orderID', (req, res) => {
+    updateOrderStatus(req, res);
 });
 
 // Default route for handling all other requests
