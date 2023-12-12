@@ -5,7 +5,9 @@ const mysql = require('mysql2/promise');
 const { generateToken } = require('../../utils/authentication'); // Ensure this path is correct
 require('dotenv').config();
 
-const CLIENT_ID = 'CLIENT_ID';
+
+// When you are testing out the server, please enable the gmailAPI in google cloud console and add your credentials here
+const CLIENT_ID = 'CLIENT_ID'; 
 const CLIENT_SECRET = 'CLIENT_SECRET';
 const REDIRECT_URI = 'URI';
 const REFRESH_TOKEN = 'REFRESH_TOKEN';
