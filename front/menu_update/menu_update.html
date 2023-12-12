@@ -15,7 +15,7 @@
     <button type="submit">Upload</button>
   </form>
 
-  <h1>Update Menu Item</h1>
+  <h1>Upload Menu Item</h1>
   <form id="updateForm">
     <label for="menuItemName">Menu Item Name:</label>
     <input type="text" id="menuItemName" name="menuItemName" required><br><br>
@@ -40,8 +40,17 @@
     <input type="submit" value="Update Menu Item">
   </form>
 
+  <h1>Fetch Menu and Ingredient</h1>
+  <form id="fetchForm">
+      <label for="key">Enter Key:</label>
+      <input type="text" id="key" name="key" required><br><br>
+
+      <input type="submit" value="Fetch Image">
+  </form>
+
   <div id="response"></div>
 
+  <script src="nav_fetch_menu.js"></script>
   <script src="update_menu.js"></script>
   <script src="upload_image.js"></script>
   
