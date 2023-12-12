@@ -1,6 +1,6 @@
 # RestaurantTakeOut
 ## Steps to Run the Node.js Code
-
+![Fetch Menu](imgs/fetch_menu.jpg)
 ### 1. Configure the .env File
 - Create a `.env` file in your project's root directory.
 - Add AWS credentials, JWT secret, and any other necessary environment variables. Example format:
@@ -19,7 +19,18 @@
 - Use Postman to test your API endpoints.
 - Configure requests with the correct URL, headers, and request body as needed.
 - Send requests to your server to test its responses.
+- You can use postman collection to efficiently test the apis. Send us an email.
 
-### 5. Understanding the Authentication Mechanism
+### 5. Testing APIs on browser
+- Only manager use cases can be tested in the browser
+- Testable apis in the browser as follows:
+    - employeeSignin
+    - employeeSignup
+    - menuUpload
+    - generateUploadURL (used for uploading image on AWS S3)
+    - getMenuItemDetails
+    - fetchImage
+
+### 6. Understanding the Authentication Mechanism
 - The application uses JSON Web Tokens (JWT) for authentication. For instance, the /signin endpoint generates a JWT token as a response.
 - Some APIs such as `fetchEmployee` require this token in the authentication header. When sending a request to these APIs, include the token value as needed.
