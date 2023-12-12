@@ -13,6 +13,7 @@ const {verifyToken,
 const {menuUpload} = require('./use_case/manager/menuUpload.js')
 
 const { generateUploadURL } = require('./use_case/manager/pasS3Url.js');
+const { fetchImage, getMenuItemDetails } = require('./use_case/manager/fetch_menu.js')
 
 // const menuRoutes = require('./use_case/customer/menu.js');
 // const orderRoutes = require('./use_case/customer/order.js');
@@ -43,7 +44,25 @@ app.post('/signup', (req, res) => {
     signUp({ body: data }, res);
 });
 
+// Define a route for handling POST requests to "/signin"
+app.post('/signin', (req, res) => {
+    const data = req.body;
+    if (!data) {
+        return res.status(400).json({ message: 'Invalid JSON' });
+    }
+    signIn({ body: data }, res);
+});
 
+
+app.get('/image/:key', async (req, res) => {
+    try {
+        const imageBuffer = await fetchImage(req.params.key);
+        res.writeHead(200, {'Content-Type': 'image/jpeg'});
+        res.end(imageBuffer, 'binary');
+    } catch (err) {
+        res.status(500).send('Error fetching image');
+    }
+});
 
 app.post('/s3Url', async (req, res) => {
   const imageName = req.body.imageName; // Get the image name from the request body
@@ -59,14 +78,16 @@ app.post('/s3Url', async (req, res) => {
   }
 })
 
-// Define a route for handling POST requests to "/signin"
-app.post('/signin', (req, res) => {
-    const data = req.body;
-    if (!data) {
-        return res.status(400).json({ message: 'Invalid JSON' });
-    }
-    signIn({ body: data }, res);
-});
+app.get('/menu/:menuItemName', (req, res) => {
+    const menuItemName = req.params.menuItemName;
+    getMenuItemDetails(menuItemName, (error, details) => {
+      if (error) {
+        res.status(500).send('Server error occurred');
+      } else {
+        res.json(details);
+      }
+    });
+  });
 
 // Define a route for handling GET requests to "/manager/employees"
 app.get('/manager/employees', (req, res) => {
