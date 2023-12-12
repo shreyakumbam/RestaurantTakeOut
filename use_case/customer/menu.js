@@ -7,8 +7,8 @@ require('dotenv').config();
 
 const dbhost = process.env.DB_HOST;
 const dbuser = process.env.DB_USER;
-const dbpass = process.env.REFRESH_TOKEN;
-const dbname = process.env.DB_PASS;
+const dbpass = process.env.DB_PASS;
+const dbname = process.env.DB_Name;
 
 
 const db = mysql.createConnection({
