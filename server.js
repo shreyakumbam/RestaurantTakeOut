@@ -15,9 +15,11 @@ const {menuUpload} = require('./use_case/manager/menuUpload.js')
 const { generateUploadURL } = require('./use_case/manager/pasS3Url.js');
 const { fetchImage, getMenuItemDetails } = require('./use_case/manager/fetch_menu.js')
 
-// const menuRoutes = require('./use_case/customer/menu.js');
-// const orderRoutes = require('./use_case/customer/order.js');
-// const userRoutes = require('./use_case/customer/user.js');
+const menuRoutes = require('./use_case/customer/menu.js');
+const orderRoutes = require('./use_case/customer/order.js');
+const userRoutes = require('./use_case/customer/user.js');
+const faqRoutes = require('./use_case/customer/faq.js');
+const spoonRoutes = require('./use_case/customer/spoonacular.js');
 
 const searchRouter = require('./use_case/serach/Search.js')
 
@@ -29,9 +31,11 @@ const PORT = 3000;
 app.use(bodyParser.json());
 app.use(express.static('front'));
 
-// app.use('/menu', menuRoutes);
-// app.use('/order', orderRoutes);
-// app.use('/user', userRoutes);
+app.use('/menu', menuRoutes);
+app.use('/order', orderRoutes);
+app.use('/user', userRoutes);
+app.use('/faq', faqRoutes);
+app.use('/spoonacular', spoonRoutes);
 
 app.use('/search', searchRouter);
 
