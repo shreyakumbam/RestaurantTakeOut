@@ -93,6 +93,21 @@ app.get('/menu/:menuItemName', (req, res) => {
     });
   });
 
+// Define a route for handling POST requests to "/manager/menu"
+app.post('/manager/menu', (req, res) => {
+    // Implement verifyToken and menuUpload logic here
+    verifyToken(req, res, (err, initiatingManagerID) => {
+        if (err) {
+            return res.status(err.status || 500).json({ message: err.message });
+        }
+        const data = req.body;
+        if (!data) {
+            return res.status(400).json({ message: 'Invalid JSON' });
+        }
+        menuUpload({ body: data }, res);
+    });
+});
+
 // Define a route for handling GET requests to "/manager/employees"
 app.get('/manager/employees', (req, res) => {
     // Implement verifyToken and fetchEmployee logic here
@@ -156,21 +171,6 @@ app.delete('/manager/role-change-requests/:userID/decline', (req, res) => {
             return res.status(err.status || 500).json({ message: err.message });
         }
         declineRoleChangeRequest(req, res);
-    });
-});
-
-// Define a route for handling POST requests to "/manager/menu"
-app.post('/manager/menu', (req, res) => {
-    // Implement verifyToken and menuUpload logic here
-    verifyToken(req, res, (err, initiatingManagerID) => {
-        if (err) {
-            return res.status(err.status || 500).json({ message: err.message });
-        }
-        const data = req.body;
-        if (!data) {
-            return res.status(400).json({ message: 'Invalid JSON' });
-        }
-        menuUpload({ body: data }, res);
     });
 });
 
