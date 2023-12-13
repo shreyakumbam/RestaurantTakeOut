@@ -19,6 +19,7 @@ const menuRoutes = require('./use_case/customer/menu.js');
 const orderRoutes = require('./use_case/customer/order.js');
 const userRoutes = require('./use_case/customer/user.js');
 const faqRoutes = require('./use_case/customer/faq.js');
+const feedback = require('./use_case/customer/feedback.js');
 const spoonRoutes = require('./use_case/customer/spoonacular.js');
 
 const searchRouter = require('./use_case/serach/Search.js')
@@ -36,6 +37,8 @@ app.use('/order', orderRoutes);
 app.use('/user', userRoutes);
 app.use('/faq', faqRoutes);
 app.use('/spoonacular', spoonRoutes);
+app.use('/feedback', feedback);
+
 
 app.use('/search', searchRouter);
 
