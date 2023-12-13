@@ -3,7 +3,7 @@ const url = require('url');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const { signUp, signIn } = require('./use_case/manager/employeeSign.js');
+const { employeeSignUp, employeeSignIn } = require('./use_case/manager/employeeSign.js');
 const {verifyToken,  
     fetchEmployee, 
     requestRoleChange, 
@@ -31,30 +31,30 @@ const PORT = 3000;
 app.use(bodyParser.json());
 app.use(express.static('front'));
 
-app.use('/menu', menuRoutes);
-app.use('/order', orderRoutes);
-app.use('/user', userRoutes);
-app.use('/faq', faqRoutes);
-app.use('/spoonacular', spoonRoutes);
+// app.use('/menu', menuRoutes);
+// app.use('/order', orderRoutes);
+// app.use('/user', userRoutes);
+// app.use('/faq', faqRoutes);
+// app.use('/spoonacular', spoonRoutes);
 
 app.use('/search', searchRouter);
 
 // Define a route for handling POST requests to "/signup"
-app.post('/signup', (req, res) => {
+app.post('/employeeSignup', (req, res) => {
     const data = req.body;
     if (!data) {
         return res.status(400).json({ message: 'Invalid JSON' });
     }
-    signUp({ body: data }, res);
+    employeeSignUp({ body: data }, res);
 });
 
 // Define a route for handling POST requests to "/signin"
-app.post('/signin', (req, res) => {
+app.post('/employeeSignin', (req, res) => {
     const data = req.body;
     if (!data) {
         return res.status(400).json({ message: 'Invalid JSON' });
     }
-    signIn({ body: data }, res);
+    employeeSignIn({ body: data }, res);
 });
 
 
@@ -92,6 +92,21 @@ app.get('/menu/:menuItemName', (req, res) => {
       }
     });
   });
+
+// Define a route for handling POST requests to "/manager/menu"
+app.post('/manager/menu', (req, res) => {
+    // Implement verifyToken and menuUpload logic here
+    verifyToken(req, res, (err, initiatingManagerID) => {
+        if (err) {
+            return res.status(err.status || 500).json({ message: err.message });
+        }
+        const data = req.body;
+        if (!data) {
+            return res.status(400).json({ message: 'Invalid JSON' });
+        }
+        menuUpload({ body: data }, res);
+    });
+});
 
 // Define a route for handling GET requests to "/manager/employees"
 app.get('/manager/employees', (req, res) => {
@@ -156,21 +171,6 @@ app.delete('/manager/role-change-requests/:userID/decline', (req, res) => {
             return res.status(err.status || 500).json({ message: err.message });
         }
         declineRoleChangeRequest(req, res);
-    });
-});
-
-// Define a route for handling POST requests to "/manager/menu"
-app.post('/manager/menu', (req, res) => {
-    // Implement verifyToken and menuUpload logic here
-    verifyToken(req, res, (err, initiatingManagerID) => {
-        if (err) {
-            return res.status(err.status || 500).json({ message: err.message });
-        }
-        const data = req.body;
-        if (!data) {
-            return res.status(400).json({ message: 'Invalid JSON' });
-        }
-        menuUpload({ body: data }, res);
     });
 });
 
