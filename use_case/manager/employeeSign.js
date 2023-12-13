@@ -6,7 +6,7 @@ const { connection } = require('../../utils/database');
 
 const SECRET_KEY = process.env.JWT_Secret_key;
 
-const signUp = (req, res) => {
+const employeeSignUp = (req, res) => {
     const { userName, userID, pw } = req.body;
     
     connection.query('SELECT * FROM Employee WHERE userID = ?', [userID], (error, users) => {
@@ -35,7 +35,7 @@ const signUp = (req, res) => {
     });
 };
 
-const signIn = (req, res) => {
+const employeeSignIn = (req, res) => {
     const { userID, pw } = req.body;
     
     connection.query('SELECT * FROM Employee WHERE userID = ?', [userID], (error, users) => {
@@ -64,6 +64,6 @@ const signIn = (req, res) => {
 };
 
 module.exports = {
-    signUp,
-    signIn
+    employeeSignUp,
+    employeeSignIn
 };
