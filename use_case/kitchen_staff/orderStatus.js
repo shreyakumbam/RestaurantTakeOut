@@ -44,4 +44,34 @@ const updateOrderStatus = (req, res) => {
     }
 };
 
-module.exports = { updateOrderStatus };
+const getOrderStatus = (req, res) => {
+    try {
+        const selectQuery = "SELECT * FROM `Order`;";
+
+        connection.query(selectQuery, (error, results) => {
+            if (error) {
+                console.error('Database error:', error);
+                res.status(500).json({ error: 'Database error', details: error.message });
+            } else {
+                // Modify this part based on your actual column names
+                const orders = results.map(({ orderID, status, customerNumber, menuItem, totalPrice, discount, pickup, forTable }) => ({
+                    orderID,
+                    status,
+                    customerNumber,
+                    menuItem,
+                    totalPrice,
+                    discount,
+                    pickup,
+                    forTable
+                }));
+                res.status(200).json({ data: orders });
+            }
+        });
+    } catch (error) {
+        res.status(400).json({ error: 'Invalid or unsupported request data' });
+    }
+};
+
+
+
+module.exports = { getOrderStatus, updateOrderStatus };
