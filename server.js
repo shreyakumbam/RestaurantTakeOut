@@ -37,7 +37,7 @@ app.use('/order', orderRoutes);
 app.use('/user', userRoutes);
 app.use('/faq', faqRoutes);
 app.use('/spoonacular', spoonRoutes);
-app.use('/feedback', feedback);
+// app.use('/feedback', feedback);
 
 app.use('/search', searchRouter);
 
