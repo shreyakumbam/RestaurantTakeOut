@@ -7,10 +7,10 @@ require('dotenv').config();
 
 
 // When you are testing out the server, please enable the gmailAPI in google cloud console and add your credentials here
-const CLIENT_ID = 'CLIENT_ID'; 
-const CLIENT_SECRET = 'CLIENT_SECRET';
-const REDIRECT_URI = 'URI';
-const REFRESH_TOKEN = 'REFRESH_TOKEN';
+const CLIENT_ID = process.env.CLIENT_ID; 
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 
 
 const dbhost = process.env.DB_HOST;

@@ -39,7 +39,6 @@ app.use('/faq', faqRoutes);
 app.use('/spoonacular', spoonRoutes);
 app.use('/feedback', feedback);
 
-
 app.use('/search', searchRouter);
 
 // Define a route for handling POST requests to "/signup"
